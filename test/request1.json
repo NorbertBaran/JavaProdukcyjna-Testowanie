@@ -1,0 +1,12 @@
+[ {
+  "name" : "Jan Kowalski",
+  "height" : 0,
+  "mass" : 0,
+  "hair_color" : null,
+  "skin_color" : null,
+  "eye_color" : "pink",
+  "birth_year" : null,
+  "gender" : null,
+  "homeworld" : null,
+  "planet" : null
+} ]

@@ -1,11 +1,14 @@
 package uj.jwzp2019.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uj.jwzp2019.YamlAndJsonSaver;
 import uj.jwzp2019.model.Person;
 import uj.jwzp2019.service.PeopleService;
+import uj.jwzp2019.service.SystemService;
+import uj.jwzp2019.service.saver.JsonSaverService;
+import uj.jwzp2019.service.saver.YamlSaverService;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,30 +16,38 @@ import java.util.List;
 @RestController
 public class SaveController {
 
-    private static String PREFIX;
+    private PeopleService peopleService;
+    private SystemService systemService;
+    private YamlSaverService yamlSaverService;
+    private JsonSaverService jsonSaverService;
 
-    public SaveController() {
-        init();
+    private String PREFIX;
+
+    @Autowired
+    public SaveController(PeopleService peopleService, SystemService systemService, YamlSaverService yamlSaverService, JsonSaverService jsonSaverService) {
+        this.peopleService=peopleService;
+        this.systemService=systemService;
+        this.yamlSaverService=yamlSaverService;
+        this.jsonSaverService=jsonSaverService;
     }
 
-    private static void init() {
+    private void init() {
         if (PREFIX == null) {
-            PREFIX = "/" + System.getProperty("PREFIX");
+            PREFIX = "/" + systemService.getProperty("PREFIX");
         }
     }
 
     @RequestMapping("/save")
     public String saveToFiles(@RequestParam(value="id", defaultValue="1") int id) throws IOException {
-
-        long time = System.currentTimeMillis();
+        init();
+        long time = systemService.currentTimeMillis();
         String fileName = PREFIX + time;
 
-        PeopleService peopleService = new PeopleService();
         Person person = peopleService.getPersonById(id);
         person.setEye_color("pink");
 
-        YamlAndJsonSaver.saveListToJson(List.of(person), fileName + ".json");
-        YamlAndJsonSaver.saveListToYaml(List.of(person), fileName + ".yaml");
+        jsonSaverService.saveListToJson(List.of(person), fileName + ".json");
+        yamlSaverService.saveListToYaml(List.of(person), fileName + ".yaml");
         return "Ok";
     }
 
