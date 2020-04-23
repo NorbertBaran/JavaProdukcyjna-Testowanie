@@ -1,14 +1,12 @@
 package uj.jwzp2019.controller;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Assert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.BDDMockito;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import uj.jwzp2019.model.Person;
@@ -17,18 +15,11 @@ import uj.jwzp2019.service.SystemService;
 import uj.jwzp2019.service.saver.JsonSaverService;
 import uj.jwzp2019.service.saver.YamlSaverService;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
+import java.io.IOException;;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 public class SaveControllerTest {
@@ -46,7 +37,7 @@ public class SaveControllerTest {
     private SaveController saveController;
 
     @Test
-    public void saveToFilesWithDefaults() throws Exception {
+    void saveToFilesWithDefaults() throws Exception {
         //given
         Person jan=new Person();
         jan.setName("Jan Kowalski");
@@ -57,34 +48,55 @@ public class SaveControllerTest {
         jsonSaverService=BDDMockito.spy(new JsonSaverService(systemService));
         yamlSaverService=BDDMockito.spy(new YamlSaverService(systemService));
         saveController=BDDMockito.spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
-
-        //URI uri=SaveControllerTest.class.getResource("src/test/resources/result-correct/request1-correct.json").toURI();
-        //List<String> resultCorrect= Files.readAllLines(Paths.get("src/test/resources/result-correct/request1-correct.json"));
-        List<String> resultCorrect= Files.readAllLines(Paths.get("build/resources/test/result-correct/request1-correct.json"));
-
+        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
+        //List<String> correctJson= Files.readAllLines(Paths.get("src/test/resources/result-correct/request1-correct.json"));
+        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
+        //List<String> correctYaml= Files.readAllLines(Paths.get("src/test/resources/result-correct/request1-correct.yaml"));
         //when
         saveController.saveToFiles(1);
-        //List<String> result=Files.readAllLines(Paths.get("src/test/resources/result/request1.json"));
-        List<String> result=Files.readAllLines(Paths.get("build/resources/test/result/request1.json"));
         //then
-        //Assertions.assertThat(jan2.toString()).isEqualTo("request123456");
-        //Assertions.assertThat(result).is(resultCorrect);
-        Assert.assertEquals(result, resultCorrect);
+        List<String> resultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.json").toURI()));
+        //List<String> resultJson=Files.readAllLines(Paths.get("src/test/resources/result/request1.json"));
+        List<String> resultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").toURI()));
+        //List<String> resultYaml=Files.readAllLines(Paths.get("src/test/resources/result/request1.yaml"));
+
+        Assert.assertEquals(resultJson, correctJson);
+        Assert.assertEquals(resultYaml, correctYaml);
+
+        Files.delete(Paths.get("src/test/resources/result/request1.json"));
+        Files.delete(Paths.get("src/test/resources/result/request1.yaml"));
     }
 
     @Test
-    public void saveToFilesWithChangedPrefix(){
+    void saveToFilesWithChangedPrefix() throws Exception{
+        //given
+        Person jan=new Person();
+        jan.setName("Jan Kowalski");
+        BDDMockito.given(peopleService.getPersonById(1)).willReturn(jan);
+        BDDMockito.given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
+        BDDMockito.given(systemService.currentTimeMillis()).willReturn(1L);
+        jsonSaverService=BDDMockito.spy(new JsonSaverService(systemService));
+        yamlSaverService=BDDMockito.spy(new YamlSaverService(systemService));
+        saveController=BDDMockito.spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
+        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
+        //List<String> correctJson= Files.readAllLines(Paths.get("src/test/resources/result-correct/request1-correct.json"));
+        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
+        //List<String> correctYaml= Files.readAllLines(Paths.get("src/test/resources/result-correct/request1-correct.yaml"));
+        //when
+        saveController.changePrefix("changedRequest");
+        saveController.saveToFiles(1);
+        //then
+        List<String> changedResultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.json").toURI()));
+        //List<String> changedResultJson=Files.readAllLines(Paths.get("src/test/resources/result/changedRequest1.json"));
+        List<String> changedResultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").toURI()));
+        //List<String> changedResultYaml=Files.readAllLines(Paths.get("src/test/resources/result/changedRequest1.yaml"));
 
+        Assert.assertEquals(changedResultJson, correctJson);
+        Assert.assertEquals(changedResultYaml, correctYaml);
+
+        Files.delete(Paths.get("src/test/resources/result/changedRequest1.json"));
+        Files.delete(Paths.get("src/test/resources/result/changedRequest1.yaml"));
     }
 
-    @Test
-    public void saveToFilesWithChangedId(){
-
-    }
-
-    @Test
-    public void saveToFilesWithEmptyResult(){
-        //Assertions.assertThat("nieok").isEqualTo("ok");
-    }
 
 }
