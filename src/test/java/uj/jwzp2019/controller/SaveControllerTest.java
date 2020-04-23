@@ -1,15 +1,12 @@
 package uj.jwzp2019.controller;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
@@ -20,13 +17,12 @@ import uj.jwzp2019.service.SystemService;
 import uj.jwzp2019.service.saver.JsonSaverService;
 import uj.jwzp2019.service.saver.YamlSaverService;
 
-import java.io.IOException;;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.spy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,19 +47,19 @@ public class SaveControllerTest {
         //given
         Person jan=new Person();
         jan.setName("Jan Kowalski");
-        BDDMockito.given(peopleService.getPersonById(1)).willReturn(jan);
-        BDDMockito.given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
-        BDDMockito.given(systemService.getProperty("PREFIX")).willReturn("request");
-        BDDMockito.given(systemService.currentTimeMillis()).willReturn(1L);
-        jsonSaverService=BDDMockito.spy(new JsonSaverService(systemService));
-        yamlSaverService=BDDMockito.spy(new YamlSaverService(systemService));
-        saveController=BDDMockito.spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
+        given(peopleService.getPersonById(1)).willReturn(jan);
+        given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
+        given(systemService.getProperty("PREFIX")).willReturn("request");
+        given(systemService.currentTimeMillis()).willReturn(1L);
+        jsonSaverService=spy(new JsonSaverService(systemService));
+        yamlSaverService= spy(new YamlSaverService(systemService));
+        saveController= spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
         List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
         List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
         //when
         mockMvc = MockMvcBuilders.standaloneSetup(saveController)
                 .build();
-        MockHttpServletResponse response = mockMvc.perform(
+        mockMvc.perform(
                 get("/save/")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
@@ -84,19 +80,19 @@ public class SaveControllerTest {
         //given
         Person jan=new Person();
         jan.setName("Jan Kowalski");
-        BDDMockito.given(peopleService.getPersonById(2)).willReturn(jan);
-        BDDMockito.given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
-        BDDMockito.given(systemService.getProperty("PREFIX")).willReturn("request");
-        BDDMockito.given(systemService.currentTimeMillis()).willReturn(1L);
-        jsonSaverService=BDDMockito.spy(new JsonSaverService(systemService));
-        yamlSaverService=BDDMockito.spy(new YamlSaverService(systemService));
-        saveController=BDDMockito.spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
+        given(peopleService.getPersonById(2)).willReturn(jan);
+        given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
+        given(systemService.getProperty("PREFIX")).willReturn("request");
+        given(systemService.currentTimeMillis()).willReturn(1L);
+        jsonSaverService= spy(new JsonSaverService(systemService));
+        yamlSaverService= spy(new YamlSaverService(systemService));
+        saveController= spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
         List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
         List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
         //when
         mockMvc = MockMvcBuilders.standaloneSetup(saveController)
                 .build();
-        MockHttpServletResponse response = mockMvc.perform(
+        mockMvc.perform(
                 get("/save?id=2")
                         .accept(MediaType.APPLICATION_JSON))
                 .andReturn()
@@ -117,12 +113,12 @@ public class SaveControllerTest {
         //given
         Person jan=new Person();
         jan.setName("Jan Kowalski");
-        BDDMockito.given(peopleService.getPersonById(1)).willReturn(jan);
-        BDDMockito.given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
-        BDDMockito.given(systemService.currentTimeMillis()).willReturn(1L);
-        jsonSaverService=BDDMockito.spy(new JsonSaverService(systemService));
-        yamlSaverService=BDDMockito.spy(new YamlSaverService(systemService));
-        saveController=BDDMockito.spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
+        given(peopleService.getPersonById(1)).willReturn(jan);
+        given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
+        given(systemService.currentTimeMillis()).willReturn(1L);
+        jsonSaverService= spy(new JsonSaverService(systemService));
+        yamlSaverService= spy(new YamlSaverService(systemService));
+        saveController= spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
         List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
         List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
         //when
