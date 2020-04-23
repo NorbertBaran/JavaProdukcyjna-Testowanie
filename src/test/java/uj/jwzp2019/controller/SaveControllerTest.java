@@ -51,7 +51,7 @@ public class SaveControllerTest {
         Person jan=new Person();
         jan.setName("Jan Kowalski");
         BDDMockito.given(peopleService.getPersonById(1)).willReturn(jan);
-        BDDMockito.given(systemService.getProperty("user.dir")).willReturn("result");
+        BDDMockito.given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
         BDDMockito.given(systemService.getProperty("PREFIX")).willReturn("request");
         BDDMockito.given(systemService.currentTimeMillis()).willReturn(1L);
         jsonSaverService=BDDMockito.spy(new JsonSaverService(systemService));
@@ -59,11 +59,13 @@ public class SaveControllerTest {
         saveController=BDDMockito.spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
 
         //URI uri=SaveControllerTest.class.getResource("src/test/resources/result-correct/request1-correct.json").toURI();
-        List<String> resultCorrect= Files.readAllLines(Paths.get("src/test/resources/result-correct/request1-correct.json"));
+        //List<String> resultCorrect= Files.readAllLines(Paths.get("src/test/resources/result-correct/request1-correct.json"));
+        List<String> resultCorrect= Files.readAllLines(Paths.get("build/resources/test/result-correct/request1-correct.json"));
 
         //when
         saveController.saveToFiles(1);
-        List<String> result=Files.readAllLines(Paths.get("result/request1.json"));
+        //List<String> result=Files.readAllLines(Paths.get("src/test/resources/result/request1.json"));
+        List<String> result=Files.readAllLines(Paths.get("build/resources/test/result/request1.json"));
         //then
         //Assertions.assertThat(jan2.toString()).isEqualTo("request123456");
         //Assertions.assertThat(result).is(resultCorrect);
