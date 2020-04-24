@@ -17,9 +17,13 @@ import uj.jwzp2019.service.SystemService;
 import uj.jwzp2019.service.saver.JsonSaverService;
 import uj.jwzp2019.service.saver.YamlSaverService;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.spy;
@@ -48,14 +52,19 @@ public class SaveControllerTest {
         Person jan=new Person();
         jan.setName("Jan Kowalski");
         given(peopleService.getPersonById(1)).willReturn(jan);
-        given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
+        given(systemService.getProperty("user.dir")).willReturn(SaveControllerTest.class.getResource("result").getPath());
         given(systemService.getProperty("PREFIX")).willReturn("request");
         given(systemService.currentTimeMillis()).willReturn(1L);
         jsonSaverService=spy(new JsonSaverService(systemService));
         yamlSaverService= spy(new YamlSaverService(systemService));
         saveController= spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
-        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
-        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
+
+        InputStream input = SaveController.class.getResourceAsStream("result-correct/request1-correct.json");
+        BufferedReader br = new BufferedReader(new InputStreamReader(input));
+        List<String> lines = br.lines().collect(Collectors.toList());
+
+        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").getPath()));
+        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").getPath()));
         //when
         mockMvc = MockMvcBuilders.standaloneSetup(saveController)
                 .build();
@@ -65,14 +74,14 @@ public class SaveControllerTest {
                 .andReturn()
                 .getResponse();
         //then
-        List<String> resultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.json").toURI()));
-        List<String> resultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").toURI()));
+        List<String> resultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.json").getPath()));
+        List<String> resultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").getPath()));
 
         Assert.assertEquals(resultJson, correctJson);
         Assert.assertEquals(resultYaml, correctYaml);
 
-        Files.delete(Paths.get("src/test/resources/result/request1.json"));
-        Files.delete(Paths.get("src/test/resources/result/request1.yaml"));
+        Files.delete(Paths.get(SaveControllerTest.class.getResource("result/request1.json").getPath()));
+        Files.delete(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").getPath()));
     }
 
     @Test
@@ -81,14 +90,14 @@ public class SaveControllerTest {
         Person jan=new Person();
         jan.setName("Jan Kowalski");
         given(peopleService.getPersonById(2)).willReturn(jan);
-        given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
+        given(systemService.getProperty("user.dir")).willReturn(SaveControllerTest.class.getResource("result").getPath());
         given(systemService.getProperty("PREFIX")).willReturn("request");
         given(systemService.currentTimeMillis()).willReturn(1L);
         jsonSaverService= spy(new JsonSaverService(systemService));
         yamlSaverService= spy(new YamlSaverService(systemService));
         saveController= spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
-        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
-        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
+        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").getPath()));
+        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").getPath()));
         //when
         mockMvc = MockMvcBuilders.standaloneSetup(saveController)
                 .build();
@@ -98,14 +107,14 @@ public class SaveControllerTest {
                 .andReturn()
                 .getResponse();
         //then
-        List<String> resultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.json").toURI()));
-        List<String> resultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").toURI()));
+        List<String> resultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.json").getPath()));
+        List<String> resultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").getPath()));
 
         Assert.assertEquals(resultJson, correctJson);
         Assert.assertEquals(resultYaml, correctYaml);
 
-        Files.delete(Paths.get("src/test/resources/result/request1.json"));
-        Files.delete(Paths.get("src/test/resources/result/request1.yaml"));
+        Files.delete(Paths.get(SaveControllerTest.class.getResource("result/request1.json").getPath()));
+        Files.delete(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").getPath()));
     }
 
     @Test
@@ -114,13 +123,13 @@ public class SaveControllerTest {
         Person jan=new Person();
         jan.setName("Jan Kowalski");
         given(peopleService.getPersonById(1)).willReturn(jan);
-        given(systemService.getProperty("user.dir")).willReturn("src/test/resources/result");
+        given(systemService.getProperty("user.dir")).willReturn(SaveControllerTest.class.getResource("result").getPath());
         given(systemService.currentTimeMillis()).willReturn(1L);
         jsonSaverService= spy(new JsonSaverService(systemService));
         yamlSaverService= spy(new YamlSaverService(systemService));
         saveController= spy(new SaveController(peopleService, systemService, yamlSaverService, jsonSaverService));
-        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").toURI()));
-        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").toURI()));
+        List<String> correctJson= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.json").getPath()));
+        List<String> correctYaml= Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result-correct/request1-correct.yaml").getPath()));
         //when
         mockMvc = MockMvcBuilders.standaloneSetup(saveController)
                 .build();
@@ -135,14 +144,14 @@ public class SaveControllerTest {
                 .andReturn()
                 .getResponse();
         //then
-        List<String> changedResultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.json").toURI()));
-        List<String> changedResultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/request1.yaml").toURI()));
+        List<String> changedResultJson=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/changedRequest1.json").getPath()));
+        List<String> changedResultYaml=Files.readAllLines(Paths.get(SaveControllerTest.class.getResource("result/changedRequest1.yaml").getPath()));
 
         Assert.assertEquals(changedResultJson, correctJson);
         Assert.assertEquals(changedResultYaml, correctYaml);
 
-        Files.delete(Paths.get("src/test/resources/result/changedRequest1.json"));
-        Files.delete(Paths.get("src/test/resources/result/changedRequest1.yaml"));
+        Files.delete(Paths.get(SaveControllerTest.class.getResource("result/changedRequest1.json").getPath()));
+        Files.delete(Paths.get(SaveControllerTest.class.getResource("result/changedRequest1.yaml").getPath()));
     }
 
 
